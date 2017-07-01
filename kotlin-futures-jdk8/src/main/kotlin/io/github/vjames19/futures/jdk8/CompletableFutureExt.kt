@@ -59,8 +59,8 @@ inline fun <A> CompletableFuture<A>.onComplete(executor: Executor = ForkJoinPool
         }, executor)
 
 
-fun <A, B> CompletableFuture<A>.zip(executor: Executor = ForkJoinPool.commonPool(), future: CompletableFuture<B>): CompletableFuture<Pair<A, B>> =
-        zipWith(executor, future) { a, b -> a to b }
+fun <A, B> CompletableFuture<A>.zip(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<Pair<A, B>> =
+        zipWith(executor, other) { a, b -> a to b }
 
-inline fun <A, B, C> CompletableFuture<A>.zipWith(executor: Executor = ForkJoinPool.commonPool(), other: CompletableFuture<B>, crossinline f: (A, B) -> C): CompletableFuture<C> =
+inline fun <A, B, C> CompletableFuture<A>.zipWith(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A, B) -> C): CompletableFuture<C> =
         thenCombineAsync(other, BiFunction { a, b -> f(a, b) }, executor)

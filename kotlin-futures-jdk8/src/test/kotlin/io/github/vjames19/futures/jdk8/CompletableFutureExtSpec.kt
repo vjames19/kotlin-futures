@@ -151,16 +151,16 @@ object CompletableFutureExtSpec : Spek({
     describe("zip") {
         given("a successful future") {
             it("should zip them") {
-                success.zip(future = success).get() shouldEqual (1 to 1)
-                success.zip(future = ImmediateFuture { "Hello" }).get() shouldEqual (1 to "Hello")
+                success.zip(success).get() shouldEqual (1 to 1)
+                success.zip(ImmediateFuture { "Hello" }).get() shouldEqual (1 to "Hello")
             }
         }
 
         given("a failed future") {
             it("should throw the exception") {
-                { failed.zip(future = failed).get() } shouldThrow AnyException
-                { success.zip(future = failed).get() } shouldThrow AnyException
-                { failed.zip(future = success).get() } shouldThrow AnyException
+                { failed.zip(failed).get() } shouldThrow AnyException
+                { success.zip(failed).get() } shouldThrow AnyException
+                { failed.zip(success).get() } shouldThrow AnyException
             }
         }
     }
@@ -168,16 +168,16 @@ object CompletableFutureExtSpec : Spek({
     describe("zipWith") {
         given("a successful future") {
             it("should zip them") {
-                success.zipWith(other = success) { a, b -> a + b }.get() shouldEqual 2
-                success.zipWith(other = ImmediateFuture { "Hello" }) { a, b -> a.toString() + b }.get() shouldEqual "1Hello"
+                success.zipWith(success) { a, b -> a + b }.get() shouldEqual 2
+                success.zipWith(ImmediateFuture { "Hello" }) { a, b -> a.toString() + b }.get() shouldEqual "1Hello"
             }
         }
 
         given("a failed future") {
             it("should throw the exception") {
-                { failed.zipWith(other = failed) { a, b -> a + b }.get() } shouldThrow AnyException
-                { success.zipWith(other = failed) { a, b -> a + b }.get() } shouldThrow AnyException
-                { failed.zipWith(other = success) { a, b -> a + b }.get() } shouldThrow AnyException
+                { failed.zipWith(failed) { a, b -> a + b }.get() } shouldThrow AnyException
+                { success.zipWith(failed) { a, b -> a + b }.get() } shouldThrow AnyException
+                { failed.zipWith(success) { a, b -> a + b }.get() } shouldThrow AnyException
             }
         }
     }
