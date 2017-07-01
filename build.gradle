@@ -1,0 +1,78 @@
+group "io.github.vjames19"
+version "1.0-SNAPSHOT"
+
+buildscript {
+    ext {
+        kotlinVersion = "1.1.2-5"
+        junitPlatformVersion = "1.0.0-M4"
+        spekVersion = "1.1.2"
+    }
+
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/jetbrains/spek" }
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.junit.platform:junit-platform-gradle-plugin:$junitPlatformVersion"
+    }
+}
+
+repositories {
+    jcenter()
+    maven { url "http://dl.bintray.com/jetbrains/spek" }
+}
+
+allprojects {
+
+    group "io.github.vjames19"
+    version "1.0-SNAPSHOT"
+
+    apply plugin: "kotlin"
+    apply plugin: "org.junit.platform.gradle.plugin"
+
+    sourceCompatibility = 1.8
+
+    repositories {
+        jcenter()
+        maven { url "http://dl.bintray.com/jetbrains/spek" }
+    }
+
+    junitPlatform {
+        filters {
+            engines {
+                include "spek"
+            }
+        }
+        platformVersion junitPlatformVersion
+    }
+
+    compileKotlin {
+        kotlinOptions {
+            apiVersion = "1.1"
+            jvmTarget = "1.8"
+        }
+    }
+
+    compileTestKotlin {
+        kotlinOptions {
+            apiVersion = "1.1"
+            jvmTarget = "1.8"
+        }
+    }
+
+    dependencies {
+        compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlinVersion"
+
+        testCompile "org.jetbrains.spek:spek-api:$spekVersion"
+        testRuntime "org.jetbrains.spek:spek-junit-platform-engine:$spekVersion"
+        testCompile "org.junit.platform:junit-platform-launcher:$junitPlatformVersion"
+        testCompile "org.amshove.kluent:kluent:1.23"
+    }
+
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "3.5"
+    distributionType = org.gradle.api.tasks.wrapper.Wrapper.DistributionType.ALL
+}
