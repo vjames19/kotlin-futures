@@ -23,7 +23,7 @@ repositories {
     maven { url "http://dl.bintray.com/jetbrains/spek" }
 }
 
-allprojects {
+subprojects {
 
     group "io.github.vjames19"
     version "1.0-SNAPSHOT"

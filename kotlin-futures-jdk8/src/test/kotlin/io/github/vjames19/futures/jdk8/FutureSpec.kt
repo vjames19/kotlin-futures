@@ -75,7 +75,7 @@ object FutureSpec : Spek({
 
         given("a failed future") {
             it("should throw the exception") {
-                { failed.filter { it == 2 }.get() } shouldThrow AnyException
+                { failed.filter { it == 1 }.get() } shouldThrow AnyException
             }
         }
     }

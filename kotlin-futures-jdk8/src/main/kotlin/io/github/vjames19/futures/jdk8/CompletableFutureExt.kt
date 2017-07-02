@@ -9,14 +9,14 @@ import java.util.function.Function
 import java.util.function.Supplier
 
 // Creation
-inline fun <T> Future(executor: Executor = ForkJoinPool.commonPool(), crossinline block: () -> T): CompletableFuture<T> =
+inline fun <A> Future(executor: Executor = ForkJoinPool.commonPool(), crossinline block: () -> A): CompletableFuture<A> =
         CompletableFuture.supplyAsync(Supplier { block() }, executor)
 
-inline fun <T> ImmediateFuture(crossinline block: () -> T): CompletableFuture<T> = Future(DirectExecutor, block)
+inline fun <A> ImmediateFuture(crossinline block: () -> A): CompletableFuture<A> = Future(DirectExecutor, block)
 
-fun <T> T.toFuture(): CompletableFuture<T> = CompletableFuture.completedFuture(this)
+fun <A> A.toFuture(): CompletableFuture<A> = CompletableFuture.completedFuture(this)
 
-fun <T> Throwable.toFuture(): CompletableFuture<T> = CompletableFuture<T>().apply { completeExceptionally(this@toFuture) }
+fun <A> Throwable.toFuture(): CompletableFuture<A> = CompletableFuture<A>().apply { completeExceptionally(this@toFuture) }
 
 // Monadic Operations
 inline fun <A, B> CompletableFuture<A>.map(executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A) -> B): CompletableFuture<B> =
