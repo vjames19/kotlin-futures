@@ -66,6 +66,13 @@ Map allows you to transform the success of this future into another future.
 val future: CompletableFuture<String> = Future { 10 }.map { "Hello user with id: $it" }
 ```
 
+vs
+
+```kotlin
+val future: CompletableFuture<String> = Future { 10 }
+        .thenApplyAsync(Function { userId -> "Hello user with id: $userId" }, ForkJoinExecutor)
+```
+
 ### flatMap
 
 flatMap allows you to do sequential composition. Creating a new future dependent on another one.
@@ -133,7 +140,7 @@ val helloFuture = nameFuture.zip(idFuture) { name, id -> "Hello $name with id $i
 
 ## Error Handling
 
-The CompletableFuture API on its error handling callbacks it returns the exception wrapped into a CompletionException, 
+The CompletableFuture API on its error handling callbacks it returns the exception wrapped into a [CompletionException](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionException.html), 
 I found this cumbersome to deal with and instead I'm returning the actual cause to all the error handling methods provided.
 
 ### recover
@@ -233,3 +240,5 @@ val f = future.onComplete(
             // do something with the result
         })
 ```
+
+# API Comparison
