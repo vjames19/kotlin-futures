@@ -124,9 +124,9 @@ vs
 val posts: CompletableFuture<List<Post>> = fetchUser(1)
         .thenComposeAsync(Function { fetchPosts(it) }, ForkJoinExecutor)
 
-val userPosts =  fetchUser(1)
-        .thenComposeAsync(Function { user: User -> 
-            fetchPosts(user).thenApplyAsync(Function { posts: List<Post> -> 
+val userPosts: CompletableFuture<UserPosts> =  fetchUser(1)
+        .thenComposeAsync(Function { user ->
+            fetchPosts(user).thenApplyAsync(Function { posts ->
                 UserPosts(user, posts)
             }, ForkJoinExecutor)
         }, ForkJoinExecutor)
