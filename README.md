@@ -1,6 +1,8 @@
 # kotlin-futures
 A collections of extension functions to make the CompletableFuture API more **functional** and **Kotlin** like.
 
+[![](https://jitpack.io/v/vjames19/kotlin-futures.svg)](https://jitpack.io/#vjames19/kotlin-futures)
+
 # Table of Contents
 - [kotlin-futures](#kotlin-futures)
 - [Motivation](#motivation)
@@ -40,6 +42,36 @@ To achieve this I didn't want to introduce a new Future type and have to change 
 **extension functions** and **inlining** we can have better API without any extra cost.
 
 # Download
+
+Gradle
+```groovy
+repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile 'com.github.vjames19:kotlin-futures:0.1.0'
+}
+```
+
+Maven
+```xml
+<repositories>
+ <repository>
+     <id>jitpack.io</id>
+     <url>https://jitpack.io</url>
+ </repository>
+</repositories>
+
+ <dependency>
+    <groupId>com.github.vjames19</groupId>
+    <artifactId>kotlin-futures</artifactId>
+    <version>0.1.0</version>
+</dependency>
+```
+
+For the rest: https://jitpack.io/#vjames19/kotlin-futures/
 
 # How to use
 
