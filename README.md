@@ -26,18 +26,18 @@ A collections of extension functions to make the CompletableFuture API more func
 # Motivation
 
 Having worked in [Scala](https://www.scala-lang.org/what-is-scala.html) for some time and specifically using their 
-[Future API](http://docs.scala-lang.org/overviews/core/futures.html) and then going back to Kotlin a language I love :heart: :heart:, 
+[Future API](http://docs.scala-lang.org/overviews/core/futures.html) and then going back to **Kotlin a language I :heart: :heart:**,
 I came to realize that the [CompletableFuture API](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html)
 seems odd for defining and composing async operations. 
 
-Every time I use the CompletableFuture I found myself going back to the documentation to double check what a given function would do.
+Every time I use the CompletableFuture API I find myself going back to the documentation to double check what a given function would do.
 
-Now this might be a matter of taste, but being heavily inspired by the [Scala's Future API](http://www.scala-lang.org/api/current/scala/concurrent/Future.html), 
-I decided to make this library to hopefully make the [CompletableFuture API](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html) 
+Now this might be a matter of taste, but being heavily inspired by [Scala's Future API](http://www.scala-lang.org/api/current/scala/concurrent/Future.html),
+I decided to make this library to hopefully make the [CompletableFuture API](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletableFuture.html)
 more **functional and kotlin like**
 
-To achieve this I didn't want to introduce a new Future type and have to change any project to use the new Future, hence by using
-extension functions and inlining we can have better API without any extra cost.
+To achieve this I didn't want to introduce a new Future type and have to change any project to use the new Future type, hence by using
+**extension functions** and **inlining** we can have better API without any extra cost.
 
 # Download
 
