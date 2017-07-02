@@ -8,11 +8,17 @@ import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Supplier
 
+// Creation
 inline fun <T> Future(executor: Executor = ForkJoinPool.commonPool(), crossinline block: () -> T): CompletableFuture<T> =
         CompletableFuture.supplyAsync(Supplier { block() }, executor)
 
 inline fun <T> ImmediateFuture(crossinline block: () -> T): CompletableFuture<T> = Future(DirectExecutor, block)
 
+fun <T> T.toFuture(): CompletableFuture<T> = CompletableFuture.completedFuture(this)
+
+fun <T> Throwable.toFuture(): CompletableFuture<T> = CompletableFuture<T>().apply { completeExceptionally(this@toFuture) }
+
+// Monadic Operations
 inline fun <A, B> CompletableFuture<A>.map(executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A) -> B): CompletableFuture<B> =
         thenApplyAsync(Function { f(it) }, executor)
 
@@ -26,6 +32,13 @@ inline fun <A> CompletableFuture<A>.filter(executor: Executor = ForkJoinPool.com
             if (predicate(it)) it else throw NoSuchElementException("CompletableFuture.filter predicate is not satisfied")
         }
 
+fun <A, B> CompletableFuture<A>.zip(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<Pair<A, B>> =
+        zipWith(other, executor) { a, b -> a to b }
+
+inline fun <A, B, C> CompletableFuture<A>.zipWith(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A, B) -> C): CompletableFuture<C> =
+        thenCombineAsync(other, BiFunction { a, b -> f(a, b) }, executor)
+
+// Error handling / Recovery
 inline fun <A> CompletableFuture<A>.recover(crossinline f: (Throwable) -> A): CompletableFuture<A> = exceptionally { f(it) }
 
 inline fun <A> CompletableFuture<A>.recoverWith(executor: Executor = ForkJoinPool.commonPool(), crossinline f: (Throwable) -> CompletableFuture<A>): CompletableFuture<A> {
@@ -41,6 +54,7 @@ inline fun <A> CompletableFuture<A>.fallbackTo(executor: Executor = ForkJoinPool
         recoverWith(executor, { f() })
 
 
+// Callbacks
 inline fun <A> CompletableFuture<A>.onFailure(executor: Executor = ForkJoinPool.commonPool(), crossinline f: (Throwable) -> Unit): CompletableFuture<A> =
         whenCompleteAsync(BiConsumer { _, throwable: Throwable? ->
             throwable?.let { f(it.cause ?: it) }
@@ -60,16 +74,6 @@ inline fun <A> CompletableFuture<A>.onComplete(executor: Executor = ForkJoinPool
             }
         }, executor)
 
-
-fun <A, B> CompletableFuture<A>.zip(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<Pair<A, B>> =
-        zipWith(other, executor) { a, b -> a to b }
-
-inline fun <A, B, C> CompletableFuture<A>.zipWith(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A, B) -> C): CompletableFuture<C> =
-        thenCombineAsync(other, BiFunction { a, b -> f(a, b) }, executor)
-
-fun <T> T.toFuture(): CompletableFuture<T> = CompletableFuture.completedFuture(this)
-
-fun <T> Throwable.toFuture(): CompletableFuture<T> = CompletableFuture<T>().apply { completeExceptionally(this@toFuture) }
 
 object Future {
 
