@@ -1,7 +1,7 @@
 # kotlin-futures
 A collections of extension functions to make the CompletableFuture API more **functional** and **Kotlin** like.
 
-[![](https://jitpack.io/v/vjames19/kotlin-futures.svg)](https://jitpack.io/#vjames19/kotlin-futures)
+[![](https://jitpack.io/v/vjames19/kotlin-futures.svg)](https://jitpack.io/#vjames19/kotlin-futures) [![](https://travis-ci.org/vjames19/kotlin-futures.svg?branch=master)
 
 # Table of Contents
 - [kotlin-futures](#kotlin-futures)
