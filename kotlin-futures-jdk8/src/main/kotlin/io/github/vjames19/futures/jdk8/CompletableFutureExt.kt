@@ -33,9 +33,9 @@ inline fun <A> CompletableFuture<A>.filter(executor: Executor = ForkJoinPool.com
         }
 
 fun <A, B> CompletableFuture<A>.zip(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<Pair<A, B>> =
-        zipWith(other, executor) { a, b -> a to b }
+        zip(other, executor) { a, b -> a to b }
 
-inline fun <A, B, C> CompletableFuture<A>.zipWith(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A, B) -> C): CompletableFuture<C> =
+inline fun <A, B, C> CompletableFuture<A>.zip(other: CompletableFuture<B>, executor: Executor = ForkJoinPool.commonPool(), crossinline f: (A, B) -> C): CompletableFuture<C> =
         thenCombineAsync(other, BiFunction { a, b -> f(a, b) }, executor)
 
 // Error handling / Recovery
@@ -86,7 +86,7 @@ object Future {
 
     fun <A> allAsList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
             futures.fold(mutableListOf<A>().toFuture()) { fr, fa ->
-                fr.zipWith(fa, executor) { r, a -> r.add(a); r }
+                fr.zip(fa, executor) { r, a -> r.add(a); r }
             }.map(executor) { it.toList() }
 
     fun <A> successfulList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
@@ -109,6 +109,6 @@ object Future {
 
     fun <A, B> transform(iterable: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool(), f: (A) -> B): CompletableFuture<List<B>> =
             iterable.fold(mutableListOf<B>().toFuture()) { fr, fa ->
-                fr.zipWith(fa, executor) { r, a -> r.add(f(a)); r }
+                fr.zip(fa, executor) { r, a -> r.add(f(a)); r }
             }.map(executor) { it.toList() }
 }

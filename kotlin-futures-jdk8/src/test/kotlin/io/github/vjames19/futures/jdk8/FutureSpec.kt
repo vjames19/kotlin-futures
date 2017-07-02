@@ -166,19 +166,19 @@ object FutureSpec : Spek({
         }
     }
 
-    describe("zipWith") {
+    describe("zip with a function being passed") {
         given("a successful future") {
             it("should zip them") {
-                success.zipWith(success) { a, b -> a + b }.get() shouldEqual 2
-                success.zipWith(ImmediateFuture { "Hello" }) { a, b -> a.toString() + b }.get() shouldEqual "1Hello"
+                success.zip(success) { a, b -> a + b }.get() shouldEqual 2
+                success.zip(ImmediateFuture { "Hello" }) { a, b -> a.toString() + b }.get() shouldEqual "1Hello"
             }
         }
 
         given("a failed future") {
             it("should throw the exception") {
-                { failed.zipWith(failed) { a, b -> a + b }.get() } shouldThrow AnyException
-                { success.zipWith(failed) { a, b -> a + b }.get() } shouldThrow AnyException
-                { failed.zipWith(success) { a, b -> a + b }.get() } shouldThrow AnyException
+                { failed.zip(failed) { a, b -> a + b }.get() } shouldThrow AnyException
+                { success.zip(failed) { a, b -> a + b }.get() } shouldThrow AnyException
+                { failed.zip(success) { a, b -> a + b }.get() } shouldThrow AnyException
             }
         }
     }
