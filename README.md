@@ -1,5 +1,5 @@
 # kotlin-futures
-A collections of extension functions to make the CompletableFuture API more functional and Kotlin like.
+A collections of extension functions to make the CompletableFuture API more **functional** and **Kotlin** like.
 
 # Table of Contents
 - [kotlin-futures](#kotlin-futures)
