@@ -21,9 +21,14 @@ extension functions and inlining we can have better API without any extra cost.
 
 # How to use
 
+Every single operation accepts an Executor as its argument, by default it uses the ForkJoinPool. 
+
+For IO / blocking operations you should specify your own.
+
 ## Creation
 
-Creating a Future that runs on a given Executor, by default is the ForkJoinPool.
+Creating a Future that runs on a given Executor (by default its the ForkJoinExecutor)
+
 ```kotlin
 import io.github.vjames19.futures.jdk8.ForkJoinExecutor
 import io.github.vjames19.futures.jdk8.Future
@@ -304,4 +309,12 @@ val f = future.whenCompleteAsync(BiConsumer({ result, throwable ->
         // do something with the result
     }
 }), ForkJoinExecutor)
+```
+
+# Tests
+
+In the tests you can find more example as to how to use a given operator.
+
+```
+./gradlew test
 ```
