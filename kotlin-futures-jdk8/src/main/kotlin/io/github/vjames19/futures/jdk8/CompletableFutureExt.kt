@@ -39,7 +39,7 @@ inline fun <A, B, C> CompletableFuture<A>.zip(other: CompletableFuture<B>, execu
         thenCombineAsync(other, BiFunction { a, b -> f(a, b) }, executor)
 
 // Error handling / Recovery
-inline fun <A> CompletableFuture<A>.recover(crossinline f: (Throwable) -> A): CompletableFuture<A> = exceptionally { f(it) }
+inline fun <A> CompletableFuture<A>.recover(crossinline f: (Throwable) -> A): CompletableFuture<A> = exceptionally { f(it.cause ?: it) }
 
 inline fun <A> CompletableFuture<A>.recoverWith(executor: Executor = ForkJoinExecutor, crossinline f: (Throwable) -> CompletableFuture<A>): CompletableFuture<A> {
     val future = CompletableFuture<A>()

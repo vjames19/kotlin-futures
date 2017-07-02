@@ -41,6 +41,18 @@ val futureWithCustomExecutor = Future(myExecutor) {
 }
 ```
 
+vs
+
+```kotlin
+val future: CompletableFuture<Int> = CompletableFuture.supplyAsync { 10 }
+
+// ForkJoinExecutor its just an alias ForkJoinPool.commonPool()
+val futureOnForkJoin = CompletableFuture.supplyAsync(Supplier { 10 }, ForkJoinExecutor)
+
+val myExecutor = Executors.newSingleThreadExecutor()
+val futureWithCustomExecutor = CompletableFuture.supplyAsync(Supplier { 10 }, myExecutor)
+```
+
 Creating immediate futures that run on the given thread.
 
 ```kotlin
@@ -55,6 +67,14 @@ val anotherImmediateFuture = "Hello".toString()
 val aFailedImmediateFuture = IllegalArgumentException().toCompletableFuture<String>()
 
 val futureWithTypeInference: CompletableFuture<String> = IllegalArgumentException().toCompletableFuture()
+```
+
+vs
+
+```kotlin
+val future: CompletableFuture<String> = CompletableFuture.completedFuture("Hello")
+
+val aFailedImmediateFuture = CompletableFuture<String>().apply { completeExceptionally(IllegalArgumentException()) }
 ```
 
 ## Composition
@@ -98,6 +118,20 @@ val userPosts =  fetchUser(1).flatMap { user ->
 }
 ```
 
+vs
+
+```kotlin
+val posts: CompletableFuture<List<Post>> = fetchUser(1)
+        .thenComposeAsync(Function { fetchPosts(it) }, ForkJoinExecutor)
+
+val userPosts =  fetchUser(1)
+        .thenComposeAsync(Function { user: User -> 
+            fetchPosts(user).thenApplyAsync(Function { posts: List<Post> -> 
+                UserPosts(user, posts)
+            }, ForkJoinExecutor)
+        }, ForkJoinExecutor)
+```
+
 ### flatten
 
 flatten removes a level from a nested future.
@@ -138,6 +172,13 @@ val nameFuture = Future { "Victor" }
 val helloFuture = nameFuture.zip(idFuture) { name, id -> "Hello $name with id $id" }
 ```
 
+vs
+
+```kotlin
+val helloFuture: CompletableFuture<String> = nameFuture
+        .thenCombineAsync(idFuture, BiFunction { name, id -> "Hello $name with id $id" }, ForkJoinExecutor)
+```
+
 ## Error Handling
 
 The CompletableFuture API on its error handling callbacks it returns the exception wrapped into a [CompletionException](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/CompletionException.html), 
@@ -157,6 +198,18 @@ val recovered = failed.recover { "recovered" }
 val recoveredOnlyWhenYouCanHandleTheException = failed.recover {
     if (it is NoSuchElementException) "recovered"
     else throw it
+}
+```
+
+vs
+
+```kotlin
+val recoveredOnlyWhenYouCanHandleTheException = failed.exceptionally {
+    // unwrap the CompletionException
+    val throwable = it.cause ?: it
+    
+    if (throwable is NoSuchElementException) "recovered"
+    else throw throwable
 }
 ```
 
@@ -241,4 +294,14 @@ val f = future.onComplete(
         })
 ```
 
-# API Comparison
+vs
+
+```kotlin
+val f = future.whenCompleteAsync(BiConsumer({ result, throwable ->
+    if (throwable != null) {
+        // do something with the error
+    } else {
+        // do something with the result
+    }
+}), ForkJoinExecutor)
+```
