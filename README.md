@@ -1,6 +1,28 @@
 # kotlin-futures
 A collections of extension functions to make the CompletableFuture API more functional and Kotlin like.
 
+# Table of Contents
+- [kotlin-futures](#kotlin-futures)
+- [Motivation](#motivation)
+- [Download](#download)
+- [How to use](#how-to-use)
+  * [Creation](#creation)
+  * [Composition](#composition)
+    + [map](#map)
+    + [flatMap](#flatmap)
+    + [flatten](#flatten)
+    + [filter](#filter)
+    + [zip](#zip)
+  * [Error Handling](#error-handling)
+    + [recover](#recover)
+    + [recoverWith](#recoverwith)
+    + [fallbackTo](#fallbackto)
+  * [Callbacks](#callbacks)
+    + [onSuccess](#onsuccess)
+    + [onFailure](#onfailure)
+    + [onComplete](#oncomplete)
+- [Tests](#tests)
+
 # Motivation
 
 Having worked in [Scala](https://www.scala-lang.org/what-is-scala.html) for some time and specifically using their 
