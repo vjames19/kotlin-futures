@@ -15,8 +15,8 @@ import java.util.concurrent.CompletableFuture
  */
 object FutureSpec : Spek({
 
-    val success = 1.toFuture()
-    val failed = IllegalArgumentException().toFuture<Int>()
+    val success = 1.toCompletableFuture()
+    val failed = IllegalArgumentException().toCompletableFuture<Int>()
 
     describe("map") {
         given("a successful future") {
@@ -220,13 +220,13 @@ object FutureSpec : Spek({
     describe("allAsList") {
         given("a list of all successful futures") {
             it("should return a successful future") {
-                Future.allAsList(listOf(1.toFuture(), 2.toFuture(), 3.toFuture())).get() shouldEqual listOf(1, 2, 3)
+                Future.allAsList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), 3.toCompletableFuture())).get() shouldEqual listOf(1, 2, 3)
             }
         }
 
         given("a list with a failed future") {
             it("should return a failed future") {
-                { Future.allAsList(listOf(1.toFuture(), 2.toFuture(), IllegalArgumentException().toFuture())).get() } shouldThrow AnyException
+                { Future.allAsList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), IllegalArgumentException().toCompletableFuture())).get() } shouldThrow AnyException
             }
         }
     }
@@ -234,13 +234,13 @@ object FutureSpec : Spek({
     describe("successfulList") {
         given("a list of all successful futures") {
             it("should return a successful future") {
-                Future.successfulList(listOf(1.toFuture(), 2.toFuture(), 3.toFuture())).get() shouldEqual listOf(1, 2, 3)
+                Future.successfulList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), 3.toCompletableFuture())).get() shouldEqual listOf(1, 2, 3)
             }
         }
 
         given("a list with a failed future") {
             it("should return a failed future") {
-                Future.successfulList(listOf(1.toFuture(), 2.toFuture(), IllegalArgumentException().toFuture())).get() shouldEqual listOf(1, 2)
+                Future.successfulList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), IllegalArgumentException().toCompletableFuture())).get() shouldEqual listOf(1, 2)
             }
         }
 
@@ -254,14 +254,14 @@ object FutureSpec : Spek({
     describe("fold") {
         given("a list of all successful futures") {
             it("should fold them") {
-                val futures = (1..3).toList().map { it.toFuture() }
+                val futures = (1..3).toList().map { it.toCompletableFuture() }
                 Future.fold(futures, 0) { acc, i -> acc + i}.get() shouldEqual 1 + 2 + 3
             }
         }
 
         given("a list with a failed future") {
             it("should return the failure") {
-                val futures = (1..3).toList().map { it.toFuture() } + IllegalArgumentException().toFuture<Int>()
+                val futures = (1..3).toList().map { it.toCompletableFuture() } + IllegalArgumentException().toCompletableFuture<Int>()
                 ({ Future.fold(futures, 0) { acc, i -> acc + i}.get() }) shouldThrow AnyException
             }
         }
@@ -270,14 +270,14 @@ object FutureSpec : Spek({
     describe("reduce") {
         given("a list of all successful futures") {
             it("should reduce it") {
-                val futures = (1..3).toList().map { it.toFuture() }
+                val futures = (1..3).toList().map { it.toCompletableFuture() }
                 Future.reduce(futures) { acc, i -> acc + i}.get() shouldEqual (1 + 2 + 3)
             }
         }
 
         given("a list with a failed future") {
             it("should return the failure") {
-                val futures = (1..3).toList().map { it.toFuture() } + IllegalArgumentException().toFuture<Int>()
+                val futures = (1..3).toList().map { it.toCompletableFuture() } + IllegalArgumentException().toCompletableFuture<Int>()
                 ({ Future.reduce(futures) { acc, i -> acc + i}.get() }) shouldThrow AnyException
             }
         }
@@ -292,13 +292,13 @@ object FutureSpec : Spek({
     describe("transform") {
         given("a list of all successful futures") {
             it("should transform them") {
-                Future.transform((1..3).toList().map { it.toFuture() }) { it + 1 }.get() shouldEqual (2..4).toList()
+                Future.transform((1..3).toList().map { it.toCompletableFuture() }) { it + 1 }.get() shouldEqual (2..4).toList()
             }
         }
 
         given("a list with a failed future") {
             it("should return the failure") {
-                val futures = (1..3).toList().map { it.toFuture() } + IllegalArgumentException().toFuture<Int>()
+                val futures = (1..3).toList().map { it.toCompletableFuture() } + IllegalArgumentException().toCompletableFuture<Int>()
                 ({ Future.transform(futures) { it + 1 }.get() }) shouldThrow AnyException
             }
         }

@@ -14,9 +14,9 @@ inline fun <A> Future(executor: Executor = ForkJoinExecutor, crossinline block: 
 
 inline fun <A> ImmediateFuture(crossinline block: () -> A): CompletableFuture<A> = Future(DirectExecutor, block)
 
-fun <A> A.toFuture(): CompletableFuture<A> = CompletableFuture.completedFuture(this)
+fun <A> A.toCompletableFuture(): CompletableFuture<A> = CompletableFuture.completedFuture(this)
 
-fun <A> Throwable.toFuture(): CompletableFuture<A> = CompletableFuture<A>().apply { completeExceptionally(this@toFuture) }
+fun <A> Throwable.toCompletableFuture(): CompletableFuture<A> = CompletableFuture<A>().apply { completeExceptionally(this@toCompletableFuture) }
 
 // Monadic Operations
 inline fun <A, B> CompletableFuture<A>.map(executor: Executor = ForkJoinExecutor, crossinline f: (A) -> B): CompletableFuture<B> =
@@ -65,12 +65,12 @@ inline fun <A> CompletableFuture<A>.onSuccess(executor: Executor = ForkJoinExecu
             f(a)
         }, executor)
 
-inline fun <A> CompletableFuture<A>.onComplete(executor: Executor = ForkJoinExecutor, crossinline g: (Throwable) -> Unit, crossinline f: (A) -> Unit): CompletableFuture<A> =
+inline fun <A> CompletableFuture<A>.onComplete(executor: Executor = ForkJoinExecutor, crossinline onFailure: (Throwable) -> Unit, crossinline onSuccess: (A) -> Unit): CompletableFuture<A> =
         whenCompleteAsync(BiConsumer { a: A, throwable: Throwable? ->
             if (throwable != null) {
-                g(throwable.cause ?: throwable)
+                onFailure(throwable.cause ?: throwable)
             } else {
-                f(a)
+                onSuccess(a)
             }
         }, executor)
 
@@ -85,12 +85,12 @@ object Future {
     }
 
     fun <A> allAsList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
-            futures.fold(mutableListOf<A>().toFuture()) { fr, fa ->
+            futures.fold(mutableListOf<A>().toCompletableFuture()) { fr, fa ->
                 fr.zip(fa, executor) { r, a -> r.add(a); r }
             }.map(executor) { it.toList() }
 
     fun <A> successfulList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
-            futures.fold(mutableListOf<A>().toFuture()) { fr, fa ->
+            futures.fold(mutableListOf<A>().toCompletableFuture()) { fr, fa ->
                 fr.map(executor) { r -> fa.map(executor) { r.add(it) }; r }
             }.map(executor) { it.toList() }
 
@@ -98,7 +98,7 @@ object Future {
             fold(futures.iterator(), initial, executor, op)
 
     fun <A, R> fold(iterator: Iterator<CompletableFuture<A>>, initial: R, executor: Executor = ForkJoinExecutor, op: (R, A) -> R): CompletableFuture<R> =
-            if (!iterator.hasNext()) initial.toFuture()
+            if (!iterator.hasNext()) initial.toCompletableFuture()
             else iterator.next().flatMap(executor) { fold(iterator, op(initial, it), executor, op) }
 
     fun <A> reduce(iterable: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinExecutor, op: (A, A) -> A): CompletableFuture<A> {
@@ -108,7 +108,7 @@ object Future {
     }
 
     fun <A, B> transform(iterable: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinExecutor, f: (A) -> B): CompletableFuture<List<B>> =
-            iterable.fold(mutableListOf<B>().toFuture()) { fr, fa ->
+            iterable.fold(mutableListOf<B>().toCompletableFuture()) { fr, fa ->
                 fr.zip(fa, executor) { r, a -> r.add(f(a)); r }
             }.map(executor) { it.toList() }
 }
