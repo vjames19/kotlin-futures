@@ -1,5 +1,6 @@
 package io.github.vjames19.futures.jdk8
 
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.concurrent.ForkJoinPool
@@ -101,7 +102,16 @@ object Future {
 
     fun <A> successfulList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
             futures.fold(mutableListOf<A>().toCompletableFuture()) { fr, fa ->
-                fr.map(executor) { r -> fa.map(executor) { r.add(it) }; r }
+                fr.flatMap(executor) { r -> fa
+                        .map(executor) { Optional.of(it) }
+                        .recover { Optional.empty() }
+                        .map(executor) {
+                            if (it.isPresent) {
+                                r.add(it.get())
+                            }
+                            r
+                        }
+                }
             }.map(executor) { it.toList() }
 
     fun <A, R> fold(futures: Iterable<CompletableFuture<A>>, initial: R, executor: Executor = ForkJoinExecutor, op: (R, A) -> R): CompletableFuture<R> =
