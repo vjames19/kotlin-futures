@@ -260,13 +260,14 @@ object FutureSpec : Spek({
     describe("successfulList") {
         given("a list of all successful futures") {
             it("should return a successful future") {
-                Future.successfulList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), 3.toCompletableFuture())).get() shouldEqual listOf(1, 2, 3)
+                Future.successfulList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), Future { Thread.sleep(10); 3 })).get() shouldEqual listOf(1, 2, 3)
             }
         }
 
         given("a list with a failed future") {
-            it("should return a failed future") {
+            it("should return the list with the successful futures") {
                 Future.successfulList(listOf(1.toCompletableFuture(), 2.toCompletableFuture(), IllegalArgumentException().toCompletableFuture())).get() shouldEqual listOf(1, 2)
+                Future.successfulList(listOf(failed, 2.toCompletableFuture(), IllegalArgumentException().toCompletableFuture())).get() shouldEqual listOf(2)
             }
         }
 
