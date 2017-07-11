@@ -1,5 +1,6 @@
 package io.github.vjames19.futures.jdk8
 
+import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 import java.util.concurrent.ForkJoinPool
@@ -7,6 +8,7 @@ import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Supplier
+import kotlin.reflect.KClass
 
 // Creation
 inline fun <A> Future(executor: Executor = ForkJoinExecutor, crossinline block: () -> A): CompletableFuture<A> =
@@ -50,6 +52,15 @@ inline fun <A> CompletableFuture<A>.recoverWith(executor: Executor = ForkJoinExe
     return future
 }
 
+inline fun <A, E : Throwable> CompletableFuture<A>.mapError(clazz: KClass<E>, crossinline f: (E) -> Throwable): CompletableFuture<A> = exceptionally {
+    val throwable = it.cause ?: it
+    if (clazz.isInstance(throwable)) {
+        throw f(clazz.java.cast(throwable))
+    } else {
+        throw throwable
+    }
+}
+
 inline fun <A> CompletableFuture<A>.fallbackTo(executor: Executor = ForkJoinExecutor, crossinline f: () -> CompletableFuture<A>): CompletableFuture<A> =
         recoverWith(executor, { f() })
 
@@ -91,7 +102,16 @@ object Future {
 
     fun <A> successfulList(futures: Iterable<CompletableFuture<A>>, executor: Executor = ForkJoinPool.commonPool()): CompletableFuture<List<A>> =
             futures.fold(mutableListOf<A>().toCompletableFuture()) { fr, fa ->
-                fr.map(executor) { r -> fa.map(executor) { r.add(it) }; r }
+                fr.flatMap(executor) { r -> fa
+                        .map(executor) { Optional.of(it) }
+                        .recover { Optional.empty() }
+                        .map(executor) {
+                            if (it.isPresent) {
+                                r.add(it.get())
+                            }
+                            r
+                        }
+                }
             }.map(executor) { it.toList() }
 
     fun <A, R> fold(futures: Iterable<CompletableFuture<A>>, initial: R, executor: Executor = ForkJoinExecutor, op: (R, A) -> R): CompletableFuture<R> =

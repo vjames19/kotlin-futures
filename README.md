@@ -290,6 +290,19 @@ val recoveredOnlyWhenYouCanHandleTheException = failed.recoverWith {
 }
 ```
 
+### mapError
+
+mapError allows you only to transform the error types you are interested
+
+```kotlin
+import io.github.vjames19.futures.jdk8.*
+
+val failed = Future<String> { throw IllegalArgumentException() }
+        .mapError(IllegalArgumentException::class) {
+            // handle the IllegalArgumentException here and return a more pertinent exception
+        }
+```
+
 ### fallbackTo
 
 fallbackTo fallbacks to the specified future, in the event that the original future fails
