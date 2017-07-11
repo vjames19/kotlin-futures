@@ -1,13 +1,11 @@
 package io.github.vjames19.futures.jdk8
 
-import org.amshove.kluent.AnyException
-import org.amshove.kluent.shouldBeInstanceOf
-import org.amshove.kluent.shouldEqual
-import org.amshove.kluent.shouldThrow
+import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
+import org.jetbrains.spek.api.dsl.on
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -110,6 +108,34 @@ object FutureSpec : Spek({
         given("a failed future") {
             it("should fallback to the specified future") {
                 failed.fallbackTo { Future { 2 } }.get() shouldEqual 2
+            }
+        }
+    }
+
+    describe("mapError") {
+        given("a successful future") {
+            it("it shouldn't have to map the error") {
+                success.mapError(IllegalArgumentException::class) { IllegalStateException() }.get() shouldEqual 1
+            }
+        }
+
+        given("a failed future") {
+            on("an exception type that its willing to handle") {
+                it("should map the error") {
+                    { failed.mapError(IllegalArgumentException::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
+                }
+            }
+
+            on("an exception type that it didn't register for") {
+                it("should throw the original error") {
+                    { failed.mapError(IllegalStateException::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (IllegalArgumentException::class)
+                }
+            }
+
+            on("handling the supertype Throwable") {
+                it("should map the error") {
+                    { failed.mapError(Throwable::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
+                }
             }
         }
     }
@@ -255,14 +281,14 @@ object FutureSpec : Spek({
         given("a list of all successful futures") {
             it("should fold them") {
                 val futures = (1..3).toList().map { it.toCompletableFuture() }
-                Future.fold(futures, 0) { acc, i -> acc + i}.get() shouldEqual 1 + 2 + 3
+                Future.fold(futures, 0) { acc, i -> acc + i }.get() shouldEqual 1 + 2 + 3
             }
         }
 
         given("a list with a failed future") {
             it("should return the failure") {
                 val futures = (1..3).toList().map { it.toCompletableFuture() } + IllegalArgumentException().toCompletableFuture<Int>()
-                ({ Future.fold(futures, 0) { acc, i -> acc + i}.get() }) shouldThrow AnyException
+                ({ Future.fold(futures, 0) { acc, i -> acc + i }.get() }) shouldThrow AnyException
             }
         }
     }
@@ -271,20 +297,20 @@ object FutureSpec : Spek({
         given("a list of all successful futures") {
             it("should reduce it") {
                 val futures = (1..3).toList().map { it.toCompletableFuture() }
-                Future.reduce(futures) { acc, i -> acc + i}.get() shouldEqual (1 + 2 + 3)
+                Future.reduce(futures) { acc, i -> acc + i }.get() shouldEqual (1 + 2 + 3)
             }
         }
 
         given("a list with a failed future") {
             it("should return the failure") {
                 val futures = (1..3).toList().map { it.toCompletableFuture() } + IllegalArgumentException().toCompletableFuture<Int>()
-                ({ Future.reduce(futures) { acc, i -> acc + i}.get() }) shouldThrow AnyException
+                ({ Future.reduce(futures) { acc, i -> acc + i }.get() }) shouldThrow AnyException
             }
         }
 
         given("an empty list") {
             it("should throw UnsupportedOperationException") {
-                ({ Future.reduce(emptyList<CompletableFuture<Int>>()) { acc, i -> acc + i}.get() }) shouldThrow UnsupportedOperationException::class
+                ({ Future.reduce(emptyList<CompletableFuture<Int>>()) { acc, i -> acc + i }.get() }) shouldThrow UnsupportedOperationException::class
             }
         }
     }
