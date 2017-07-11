@@ -8,7 +8,6 @@ import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Supplier
-import kotlin.reflect.KClass
 
 // Creation
 inline fun <A> Future(executor: Executor = ForkJoinExecutor, crossinline block: () -> A): CompletableFuture<A> =
