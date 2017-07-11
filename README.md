@@ -298,7 +298,7 @@ mapError allows you only to transform the error types you are interested
 import io.github.vjames19.futures.jdk8.*
 
 val failed = Future<String> { throw IllegalArgumentException() }
-        .mapError(IllegalArgumentException::class) {
+        .mapError { e: IllegalArgumentException ->
             // handle the IllegalArgumentException here and return a more pertinent exception
         }
 ```

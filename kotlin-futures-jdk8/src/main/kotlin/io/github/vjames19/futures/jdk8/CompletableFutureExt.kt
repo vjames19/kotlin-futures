@@ -8,7 +8,6 @@ import java.util.function.BiConsumer
 import java.util.function.BiFunction
 import java.util.function.Function
 import java.util.function.Supplier
-import kotlin.reflect.KClass
 
 // Creation
 inline fun <A> Future(executor: Executor = ForkJoinExecutor, crossinline block: () -> A): CompletableFuture<A> =
@@ -52,10 +51,10 @@ inline fun <A> CompletableFuture<A>.recoverWith(executor: Executor = ForkJoinExe
     return future
 }
 
-inline fun <A, E : Throwable> CompletableFuture<A>.mapError(clazz: KClass<E>, crossinline f: (E) -> Throwable): CompletableFuture<A> = exceptionally {
+inline fun <A, reified E : Throwable> CompletableFuture<A>.mapError(crossinline f: (E) -> Throwable): CompletableFuture<A> = exceptionally {
     val throwable = it.cause ?: it
-    if (clazz.isInstance(throwable)) {
-        throw f(clazz.java.cast(throwable))
+    if (throwable is E) {
+        throw f(throwable)
     } else {
         throw throwable
     }
