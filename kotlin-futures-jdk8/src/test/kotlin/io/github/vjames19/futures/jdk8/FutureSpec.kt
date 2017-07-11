@@ -115,26 +115,26 @@ object FutureSpec : Spek({
     describe("mapError") {
         given("a successful future") {
             it("it shouldn't have to map the error") {
-                success.mapError(IllegalArgumentException::class) { IllegalStateException() }.get() shouldEqual 1
+                success.mapError { _: IllegalArgumentException -> IllegalStateException() }.get() shouldEqual 1
             }
         }
 
         given("a failed future") {
             on("an exception type that its willing to handle") {
                 it("should map the error") {
-                    { failed.mapError(IllegalArgumentException::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
+                    { failed.mapError { _: IllegalArgumentException -> UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
                 }
             }
 
             on("an exception type that it didn't register for") {
                 it("should throw the original error") {
-                    { failed.mapError(IllegalStateException::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (IllegalArgumentException::class)
+                    { failed.mapError { _: ClassNotFoundException -> UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (IllegalArgumentException::class)
                 }
             }
 
             on("handling the supertype Throwable") {
                 it("should map the error") {
-                    { failed.mapError(Throwable::class) { UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
+                    { failed.mapError { _: Throwable -> UnsupportedOperationException() }.get() } shouldThrowTheException AnyException withCause (UnsupportedOperationException::class)
                 }
             }
         }
