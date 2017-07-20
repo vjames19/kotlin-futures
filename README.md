@@ -19,7 +19,7 @@ A collections of extension functions to make the CompletableFuture API more **fu
     + [recover](#recover)
     + [recoverWith](#recoverwith)
     + [fallbackTo](#fallbackto)
-    + [mapError](#mapError)
+    + [mapError](#maperror)
   * [Callbacks](#callbacks)
     + [onSuccess](#onsuccess)
     + [onFailure](#onfailure)
