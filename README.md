@@ -44,6 +44,7 @@ To achieve this I didn't want to introduce a new Future type and have to change 
 
 # Download
 
+
 Gradle
 ```groovy
 repositories {
@@ -52,7 +53,12 @@ repositories {
 }
 
 dependencies {
-    compile 'com.github.vjames19:kotlin-futures:0.1.0'
+
+    // for completable future
+    compile 'com.github.vjames19.kotlin-futures:kotlin-futures-jdk8:<version>'
+
+    // for listenable future
+    compile 'com.github.vjames19.kotlin-futures:kotlin-futures-guava:<version>'
 }
 ```
 
@@ -68,7 +74,7 @@ Maven
  <dependency>
     <groupId>com.github.vjames19</groupId>
     <artifactId>kotlin-futures</artifactId>
-    <version>0.1.0</version>
+    <version>version</version>
 </dependency>
 ```
 
