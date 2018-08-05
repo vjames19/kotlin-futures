@@ -210,34 +210,43 @@ object FutureSpec : Spek({
     }
 
     describe("firstCompletedOf") {
+
         given("a successful future") {
             it("should return the first completed") {
-                val f300 = Future { Thread.sleep(300); 3 }
-                val f200 = Future { Thread.sleep(200); 2 }
-                val f10 = Future { Thread.sleep(10); 1 }
+                val f3 = Future { Thread.sleep(3000); 3 }
+                val f2 = Future { Thread.sleep(2000); 2 }
+                val f1 = Future { Thread.sleep(1); 1 }
 
-                Future.firstCompletedOf(listOf(f300, f200, f10)).get() shouldEqual 1
+
+                withFutures(listOf(f3, f2, f1)) {
+                    Future.firstCompletedOf(it).get() shouldEqual 1
+                }
+
             }
         }
 
         given("a failed future") {
             given("that its the first to complete") {
                 it("should return it") {
-                    val f300 = Future { Thread.sleep(300); 3 }
-                    val f200 = Future { Thread.sleep(200); 2 }
-                    val f10 = Future<Int> { Thread.sleep(10); throw IllegalArgumentException() }
 
-                    ({ Future.firstCompletedOf(listOf(f300, f200, f10)).get() }) shouldThrow AnyException
+                    val f3 = Future { Thread.sleep(3000); 3 }
+                    val f2 = Future { Thread.sleep(2000); 2 }
+                    val f1 = Future<Int> { Thread.sleep(1); throw IllegalArgumentException() }
+                    withFutures(listOf(f3, f2, f1)) {
+                        ({ Future.firstCompletedOf(it).get() }) shouldThrow AnyException
+                    }
                 }
             }
 
             given("that its not the first one to complete") {
                 it("should return the first one") {
-                    val f300 = Future { Thread.sleep(300); 3 }
-                    val f200 = Future<Int> { Thread.sleep(200); throw IllegalArgumentException() }
-                    val f10 = Future { Thread.sleep(10); 1 }
+                    val f3 = Future { Thread.sleep(3000); 3 }
+                    val f2 = Future<Int> { Thread.sleep(2000); throw IllegalArgumentException() }
+                    val f1 = Future { Thread.sleep(1); 1 }
 
-                    Future.firstCompletedOf(listOf(f300, f200, f10)).get() shouldEqual 1
+                    withFutures(listOf(f3, f2, f1)) {
+                        Future.firstCompletedOf(listOf(f3, f2, f1)).get() shouldEqual 1
+                    }
                 }
             }
         }
@@ -331,3 +340,8 @@ object FutureSpec : Spek({
         }
     }
 })
+
+private fun <T> withFutures(futures: List<CompletableFuture<T>>, f: (List<CompletableFuture<T>>) -> Unit): Unit {
+    f(futures)
+    futures.forEach { it.cancel(true) }
+}
