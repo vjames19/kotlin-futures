@@ -1,7 +1,7 @@
 package io.github.vjames19.futures.guava
 
 import com.google.common.util.concurrent.ListenableFuture
-import io.github.vjames19.futures.jdk8.*
+import io.github.vjames19.futures.guava.*
 import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe

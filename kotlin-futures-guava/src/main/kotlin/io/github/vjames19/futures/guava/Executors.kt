@@ -1,4 +1,4 @@
-package io.github.vjames19.futures.jdk8
+package io.github.vjames19.futures.guava
 
 import java.util.concurrent.*
 import java.util.concurrent.Future
