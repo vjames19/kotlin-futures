@@ -2,11 +2,10 @@ package io.github.vjames19.futures.jdk8
 
 import com.google.common.util.concurrent.*
 import java.util.*
-import java.util.concurrent.*
-import java.util.function.BiConsumer
-import java.util.function.BiFunction
-import java.util.function.Function
-import java.util.function.Supplier
+import java.util.concurrent.Callable
+import java.util.concurrent.Executor
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.ForkJoinPool
 
 // Creation
 inline fun <A> Future(executor: ExecutorService = ForkJoinExecutor, crossinline block: () -> A): ListenableFuture<A> {
@@ -45,15 +44,21 @@ inline fun <A> ListenableFuture<A>.recover(crossinline f: (Throwable) -> A): Lis
         Futures.catching(this, Throwable::class.java) { f(it!!.cause ?: it) }
 
 inline fun <A> ListenableFuture<A>.recoverWith(executor: Executor = ForkJoinExecutor, crossinline f: (Throwable) -> ListenableFuture<A>): ListenableFuture<A> {
-    return Futures.catchingAsync(this, Throwable::class.java) { f(it!!.cause ?: it)}
+    return Futures.catchingAsync(
+            this,
+            Throwable::class.java,
+            AsyncFunction<Throwable, A> { throwable -> f(throwable!!.cause ?: throwable) },
+            executor
+    )
 }
+
 
 inline fun <A, reified E : Throwable> ListenableFuture<A>.mapError(crossinline f: (E) -> Throwable): ListenableFuture<A> {
     return Futures.catching(this, E::class.java) { throw f(it!!) }
 }
 
 inline fun <A> ListenableFuture<A>.fallbackTo(executor: Executor = ForkJoinExecutor, crossinline f: () -> ListenableFuture<A>): ListenableFuture<A> =
-        recoverWith(executor, { f() })
+        recoverWith(executor) { f() }
 
 
 // Callbacks
@@ -82,6 +87,7 @@ inline fun <A> ListenableFuture<A>.onSuccess(executor: Executor = ForkJoinExecut
 }
 
 inline fun <A> ListenableFuture<A>.onComplete(executor: Executor = ForkJoinExecutor, crossinline onFailure: (Throwable) -> Unit, crossinline onSuccess: (A) -> Unit): ListenableFuture<A> {
+
     Futures.addCallback(this, object : FutureCallback<A> {
         override fun onSuccess(result: A?) {
             onSuccess(result!!)
