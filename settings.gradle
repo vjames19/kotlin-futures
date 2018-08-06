@@ -19,3 +19,4 @@ rootProject.name = 'kotlin-futures'
 
 include 'kotlin-futures-jdk8'
 include 'kotlin-futures-guava'
+include 'kotlin-futures-guava-to-jdk8'

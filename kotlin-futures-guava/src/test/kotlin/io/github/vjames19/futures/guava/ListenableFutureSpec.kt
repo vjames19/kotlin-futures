@@ -1,13 +1,13 @@
-package io.github.vjames19.futures.jdk8
+package io.github.vjames19.futures.guava
 
 import com.google.common.util.concurrent.ListenableFuture
+import io.github.vjames19.futures.jdk8.*
 import org.amshove.kluent.*
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.given
 import org.jetbrains.spek.api.dsl.it
 import org.jetbrains.spek.api.dsl.on
-import java.util.concurrent.CompletableFuture
 
 /**
  * Created by victor.reventos on 7/1/17.
