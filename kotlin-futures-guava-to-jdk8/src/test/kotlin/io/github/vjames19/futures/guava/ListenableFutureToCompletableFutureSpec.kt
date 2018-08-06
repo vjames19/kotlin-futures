@@ -1,7 +1,5 @@
 package io.github.vjames19.futures.guava
 
-import io.github.vjames19.futures.jdk8.ImmediateFuture
-import io.github.vjames19.futures.jdk8.toListenableFuture
 import org.amshove.kluent.shouldEqualTo
 import org.amshove.kluent.shouldThrowTheException
 import org.amshove.kluent.withCause

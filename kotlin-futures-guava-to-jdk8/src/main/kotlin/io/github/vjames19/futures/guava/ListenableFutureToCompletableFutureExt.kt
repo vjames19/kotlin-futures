@@ -1,8 +1,6 @@
 package io.github.vjames19.futures.guava
 
 import com.google.common.util.concurrent.ListenableFuture
-import io.github.vjames19.futures.jdk8.DirectExecutor
-import io.github.vjames19.futures.jdk8.onComplete
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
