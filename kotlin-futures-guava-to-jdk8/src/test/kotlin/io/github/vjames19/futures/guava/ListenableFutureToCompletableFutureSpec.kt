@@ -1,6 +1,5 @@
 package io.github.vjames19.futures.guava
 
-import com.google.common.util.concurrent.MoreExecutors
 import io.github.vjames19.futures.jdk8.ImmediateFuture
 import io.github.vjames19.futures.jdk8.toListenableFuture
 import org.amshove.kluent.shouldEqualTo
